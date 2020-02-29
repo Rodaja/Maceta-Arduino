@@ -1,4 +1,4 @@
-//Needed libraries
+//Needed libraries for the conections
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
@@ -6,8 +6,16 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 
+//Needed libraries for the air humidity and temperature sensor
+#include <DHT.h>
+#include <DHT_U.h>
+
 //Defining sensor pins
-#define groundSensor A0
+#define GROUNDSENSOR A0
+#define DHTPIN 12
+
+// Defining the air sensor type
+#define DHTTYPE DHT11
 
 //Constants
 String URL = "http://192.168.1.205:8888/api/flowerpot";
@@ -16,15 +24,20 @@ String MAC = WiFi.macAddress();
 int maxGroundHumidity = 270; //To calibrate
 int minGroundHumidity = 706; //To calibrate
 
+DHT dht(DHTPIN, DHTTYPE);
+
 void setup() {
   Serial.begin(115200); //To debug
+  dht.begin();
   setWifiManager();
   sendMacAddress();
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  int groundHumidity = getDataGroundSensor();
+  int airHumidity = getDataAirHumidity();
+  int airTemperature = getDataAirTemperature();
 
 }
 
@@ -63,7 +76,7 @@ void sendMacAddress() {
 }
 
 int getDataGroundSensor(){
-  int analogGroundSensorValue = analogRead(groundSensor);
+  int analogGroundSensorValue = analogRead(GROUNDSENSOR);
   
   // We use map() here to adjust the values to adjust the read values to the percentages we want to use
   //sensor reading, min value, max value , max percentage, min percentage
@@ -73,4 +86,14 @@ int getDataGroundSensor(){
   Serial.println("%");
 
   return valueGroundSensor;
+}
+
+int getDataAirHumidity(){
+  int humidity = dht.readHumidity();
+  return humidity;
+}
+
+int getDataAirTemperature(){
+  int temperature = dht.readTemperature();
+  return temperature;
 }
