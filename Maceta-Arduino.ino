@@ -18,7 +18,7 @@
 #define DHTTYPE DHT11
 
 //Constants
-String URL = "http://192.168.1.205:8888/api/flowerpot";
+String URL = "http://161.35.69.225:8080/gardenia/api/flowerpots";
 String MAC = WiFi.macAddress();
 
 int maxGroundHumidity = 270; //To calibrate
@@ -38,6 +38,8 @@ void loop() {
   int groundHumidity = getDataGroundSensor();
   int airHumidity = getDataAirHumidity();
   int airTemperature = getDataAirTemperature();
+  sendPlotData(groundHumidity, airHumidity, airTemperature);
+  delay(5000);
 
 }
 
@@ -96,4 +98,35 @@ int getDataAirHumidity(){
 int getDataAirTemperature(){
   int temperature = dht.readTemperature();
   return temperature;
+}
+
+void sendPlotData(int groundHumidity, int airHumidity, int airTemperature) {
+  HTTPClient http;    //Declare object of class HTTPClient
+
+  //We indicates the destination
+  http.begin(URL + "/" + MAC);
+
+  //We have to specify de format of the content we are going to send in this case JSON
+  http.addHeader("Content-Type", "application/json");
+
+  //We form here the JSON structure
+  StaticJsonBuffer<200> jsonBuffer;
+  char json[256];
+  JsonObject& root = jsonBuffer.createObject();
+  root["macAddress"] = MAC;
+  root["groundHumidity"] = groundHumidity;
+  root["airHumidity"] = airHumidity;
+  root["airTemperature"] = airTemperature;
+  root.printTo(json, sizeof(json));
+
+  // We send the request here and receive a code status
+  int httpCode = http.PUT(json);
+
+  //Here we recieve the payload status
+  String payload = http.getString();
+
+  Serial.println(httpCode);   //Print HTTP return code
+  Serial.println(payload);    //Print request response payload
+
+  http.end();
 }
