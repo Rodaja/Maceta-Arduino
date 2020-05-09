@@ -46,7 +46,7 @@ void loop() {
 void setWifiManager() {
   WiFiManager wifiManager;
 
-  wifiManager.autoConnect();
+  wifiManager.autoConnect("Gardenia");
 }
 
 void sendMacAddress() {
