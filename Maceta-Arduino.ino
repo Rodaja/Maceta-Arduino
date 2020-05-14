@@ -1,3 +1,5 @@
+#define __DEBUG__
+
 //Needed libraries for the conections
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
@@ -5,6 +7,12 @@
 #include <ESP8266WebServer.h >
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
+
+//Libraries for OLED screen
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 //Needed libraries for the air humidity and temperature sensor
 #include <DHT.h>
@@ -17,9 +25,14 @@
 // Defining the air sensor type
 #define DHTTYPE DHT11
 
-//Constants
+//Constants server
 String URL = "http://161.35.69.225:8080/gardenia/api/flowerpots";
 String MAC = WiFi.macAddress();
+
+//Constants screen
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+Adafruit_SSD1306 display(SCREEN_WIDTH,SCREEN_HEIGHT, &Wire, -1);
 
 int maxGroundHumidity = 270; //To calibrate
 int minGroundHumidity = 706; //To calibrate
@@ -31,6 +44,7 @@ void setup() {
   dht.begin();
   setWifiManager();
   sendMacAddress();
+  setupScreen();
 
 }
 
@@ -39,8 +53,21 @@ void loop() {
   int airHumidity = getDataAirHumidity();
   int airTemperature = getDataAirTemperature();
   sendPlotData(groundHumidity, airHumidity, airTemperature);
+  showDataOnScreen(groundHumidity, airHumidity, airTemperature);
   delay(5000);
 
+}
+
+void setupScreen(){
+  // Start screen at 0x3C
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+#ifdef __DEBUG__
+    Serial.println("No se encuentra la pantalla OLED");
+#endif
+    while (true);
+  }
+
+  display.clearDisplay();
 }
 
 void setWifiManager() {
@@ -129,4 +156,25 @@ void sendPlotData(int groundHumidity, int airHumidity, int airTemperature) {
   Serial.println(payload);    //Print request response payload
 
   http.end();
+}
+
+void showDataOnScreen(int groundHumidity, int airHumidity, int airTemperature){
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(10, 32);
+  
+  display.clearDisplay();
+  display.println(groundHumidity);
+  display.display();
+  delay(5000);
+  
+  display.clearDisplay();
+  display.println(airHumidity);
+  display.display();
+  delay(5000);
+  
+  display.clearDisplay();
+  display.println(airTemperature);
+  display.display();
+  delay(5000);
 }
