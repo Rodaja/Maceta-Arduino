@@ -53,8 +53,9 @@ void loop() {
   int airHumidity = getDataAirHumidity();
   int airTemperature = getDataAirTemperature();
   sendPlotData(groundHumidity, airHumidity, airTemperature);
-  showDataOnScreen(groundHumidity, airHumidity, airTemperature);
-  delay(5000);
+  showDataOnScreen(String(groundHumidity));
+  showDataOnScreen(String(airHumidity));
+  showDataOnScreen(String(airHumidity));
 
 }
 
@@ -158,23 +159,19 @@ void sendPlotData(int groundHumidity, int airHumidity, int airTemperature) {
   http.end();
 }
 
-void showDataOnScreen(int groundHumidity, int airHumidity, int airTemperature){
+void showDataOnScreen(String data){
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(10, 32);
   
+  display.setCursor(10, calculateTextCenterHorizontal(data));
   display.clearDisplay();
-  display.println(groundHumidity);
+  display.println(data);
   display.display();
-  delay(5000);
+  delay(2500);
   
-  display.clearDisplay();
-  display.println(airHumidity);
-  display.display();
-  delay(5000);
-  
-  display.clearDisplay();
-  display.println(airTemperature);
-  display.display();
-  delay(5000);
+}
+
+int calculateTextCenterHorizontal(String text){
+  int result = (SCREEN_WIDTH - strlen(text))/2;
+  return result;
 }
