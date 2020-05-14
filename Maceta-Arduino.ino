@@ -27,7 +27,7 @@
 
 //Constants server
 String URL = "http://161.35.69.225:8080/gardenia/api/flowerpots";
-String MAC = WiFi.macAddress();
+String MAC = WiFi.softAPmacAddress();
 
 //Constants screen
 #define SCREEN_WIDTH 128
