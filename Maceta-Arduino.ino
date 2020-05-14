@@ -27,7 +27,7 @@
 
 //Constants server
 String URL = "http://161.35.69.225:8080/gardenia/api/flowerpots";
-String MAC = WiFi.macAddress();
+String MAC = WiFi.softAPmacAddress();
 
 //Constants screen
 #define SCREEN_WIDTH 128
@@ -53,7 +53,10 @@ void loop() {
   int airHumidity = getDataAirHumidity();
   int airTemperature = getDataAirTemperature();
   sendPlotData(groundHumidity, airHumidity, airTemperature);
-  updateDataOnScreen(String(groundHumidity), String(airHumidity), String(airTemperature));
+  showDataOnScreen("H.  " + String(groundHumidity) + "%");
+  showDataOnScreen("T.  " + String(airHumidity) + "C");
+  showDataOnScreen("HR. " + String(airTemperature) + "%");
+  //updateDataOnScreen(String(groundHumidity), String(airHumidity), String(airTemperature));
 }
 
 void setupScreen(){
@@ -156,20 +159,14 @@ void sendPlotData(int groundHumidity, int airHumidity, int airTemperature) {
   http.end();
 }
 
-void showDataOnScreen(String data, int type){
-  display.setTextSize(2);
+void showDataOnScreen(String data){
+  display.setTextSize(3);
   display.setTextColor(SSD1306_WHITE);
   display.cp437(true);
   
-  display.setCursor(20,32);
+  display.setCursor(0,30);
   display.clearDisplay();
   display.print(data);
-  if (type == 1){
-    display.write(37);
-  }else if(type == 2){
-     display.write(167);
-     display.write(67);
-  }
   display.display();
   delay(2500);
   
@@ -182,9 +179,9 @@ void updateDataOnScreen(String groundHumidity, String airHumidity, String airTem
   
   display.setCursor(0,15);
   display.clearDisplay();
-  display.println("H.    " + groundHumidity + "%");
-  display.println("T.    " + airTemperature + "C");
-  display.println("HR.   " + airHumidity + "%");
+  display.println("H.     " + groundHumidity + "%");
+  display.println("T.     " + airTemperature + "C");
+  display.println("HR.    " + airHumidity + "%");
   display.display();
   delay(2500);
   
