@@ -32,7 +32,7 @@ String IP = "161.35.69.225";
 String URL = "http://" + IP + ":" + PORT + "/gardenia/api/flowerpots";
 String URL_UPDATE = URL + "/update";
 String MAC = WiFi.softAPmacAddress();
-String VERSION = "0.1";
+String VERSION = "0.2";
 
 //Constants screen
 #define SCREEN_WIDTH 128
