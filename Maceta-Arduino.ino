@@ -2,11 +2,12 @@
 
 //Needed libraries for the conections
 #include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
-#include <ESP8266WebServer.h >
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
+#include <ArduinoOTA.h>
 
 //Libraries for OLED screen
 #include <SPI.h>
@@ -26,8 +27,12 @@
 #define DHTTYPE DHT11
 
 //Constants server
-String URL = "http://161.35.69.225:8080/gardenia/api/flowerpots";
+int PORT = 8080;
+String IP = "161.35.69.225";
+String URL = "http://" + IP + ":" + PORT + "/gardenia/api/flowerpots";
+String URL_UPDATE = URL + "/update";
 String MAC = WiFi.softAPmacAddress();
+String VERSION = "0.1";
 
 //Constants screen
 #define SCREEN_WIDTH 128
@@ -38,6 +43,10 @@ int maxGroundHumidity = 270; //To calibrate
 int minGroundHumidity = 706; //To calibrate
 
 DHT dht(DHTPIN, DHTTYPE);
+
+
+//TEMPORAL
+int count = 0; 
 
 void setup() {
   Serial.begin(115200); //To debug
@@ -56,6 +65,14 @@ void loop() {
   showDataOnScreen("H.  " + String(groundHumidity) + "%");
   showDataOnScreen("T.  " + String(airHumidity) + "C");
   showDataOnScreen("HR. " + String(airTemperature) + "%");
+  showDataOnScreen("V:  " + VERSION);
+  showDataOnScreen("C:  " + String(count));
+  count += 1;
+
+  if (count > 1000){
+    updateSystem();
+    count = 0;
+  }
   //updateDataOnScreen(String(groundHumidity), String(airHumidity), String(airTemperature));
 }
 
@@ -168,7 +185,7 @@ void showDataOnScreen(String data){
   display.clearDisplay();
   display.print(data);
   display.display();
-  delay(2500);
+  delay(2000);
   
 }
 
@@ -187,9 +204,42 @@ void updateDataOnScreen(String groundHumidity, String airHumidity, String airTem
   
 }
 
-/*
-int calculateTextCenterHorizontal(String text){
-  //int result = (SCREEN_WIDTH - strlen(text))/2;
-  return result;
+void updateSystem(){
+
+    //Change with server data
+    t_httpUpdate_return ret =ESPhttpUpdate.update(IP, PORT, "/gardenia/api/flowerpots/update");
+    // Or:
+    Serial.println(ret);//t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
+    
+
+    switch (ret) {
+      case HTTP_UPDATE_FAILED:
+        Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        break;
+
+      case HTTP_UPDATE_NO_UPDATES:
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
+        break;
+
+      case HTTP_UPDATE_OK:
+        Serial.println("HTTP_UPDATE_OK");
+        
+        break;
+    }
+    ESP.restart();
 }
-*/
+void update_started() {
+  Serial.println("CALLBACK:  HTTP update process started");
+}
+
+void update_finished() {
+  Serial.println("CALLBACK:  HTTP update process finished");
+}
+
+void update_progress(int cur, int total) {
+  Serial.printf("CALLBACK:  HTTP update process at %d of %d bytes...\n", cur, total);
+}
+
+void update_error(int err) {
+  Serial.printf("CALLBACK:  HTTP update fatal error code %d\n", err);
+}
