@@ -32,7 +32,7 @@ String IP = "161.35.69.225";
 String URL = "http://" + IP + ":" + PORT + "/gardenia/api/flowerpots";
 String URL_UPDATE = URL + "/update";
 String MAC = WiFi.softAPmacAddress();
-String VERSION = "0.3";
+String VERSION = "0.4.0";
 
 //Constants screen
 #define SCREEN_WIDTH 128
@@ -180,6 +180,14 @@ const unsigned char logo [] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+// 'wifi', 24x24px
+const unsigned char icon_wifi [] PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x07, 0xff, 0xe0, 0x1f, 0x00, 0xf8, 0x3c, 
+  0x00, 0x3c, 0x70, 0x00, 0x0e, 0xe0, 0x00, 0x07, 0xc1, 0xff, 0x83, 0x03, 0xe7, 0xc0, 0x0f, 0x00, 
+  0xf0, 0x1c, 0x00, 0x38, 0x08, 0x00, 0x10, 0x00, 0x3c, 0x00, 0x00, 0xff, 0x00, 0x01, 0xc3, 0x80, 
+  0x01, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x3c, 0x00, 0x00, 
+  0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
 
 
 //TEMPORAL
@@ -203,8 +211,6 @@ void loop() {
   showDataOnScreen("H.  " + String(groundHumidity) + "%");
   showDataOnScreen("T.  " + String(airHumidity) + "C");
   showDataOnScreen("HR. " + String(airTemperature) + "%");
-  showDataOnScreen("V:  " + VERSION);
-  showDataOnScreen("C:  " + String(count));
   count += 1;
 
   if (count > 1000){
@@ -328,30 +334,23 @@ void sendPlotData(int groundHumidity, int airHumidity, int airTemperature) {
 }
 
 void showDataOnScreen(String data){
-  display.setTextSize(3);
   display.setTextColor(SSD1306_WHITE);
-  display.cp437(true);
   
-  display.setCursor(0,30);
   display.clearDisplay();
+  
+  display.drawBitmap(0,0, icon_wifi,24, 24, WHITE);
+  
+  display.setTextSize(1);
+  display.setCursor(97,10);
+  display.print(VERSION);
+
+  display.setTextSize(3);
+  
+  display.cp437(true);
+  display.setCursor(0,41);
   display.print(data);
   display.display();
   delay(2000);
-  
-}
-
-void updateDataOnScreen(String groundHumidity, String airHumidity, String airTemperature){
-  display.setTextSize(2);
-  display.setTextColor(SSD1306_WHITE);
-  display.cp437(true);
-  
-  display.setCursor(0,15);
-  display.clearDisplay();
-  display.println("H.     " + groundHumidity + "%");
-  display.println("T.     " + airTemperature + "C");
-  display.println("HR.    " + airHumidity + "%");
-  display.display();
-  delay(2500);
   
 }
 
