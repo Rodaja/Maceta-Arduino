@@ -338,10 +338,10 @@ void showDataOnScreen(String data){
   
   display.clearDisplay();
   
-  display.drawBitmap(0,0, icon_wifi,24, 24, WHITE);
+  display.drawBitmap(104,0, icon_wifi,24, 24, WHITE);
   
   display.setTextSize(1);
-  display.setCursor(97,10);
+  display.setCursor(0,10);
   display.print(VERSION);
 
   display.setTextSize(3);
@@ -351,7 +351,6 @@ void showDataOnScreen(String data){
   display.print(data);
   display.display();
   delay(2000);
-  
 }
 
 void updateSystem(){
