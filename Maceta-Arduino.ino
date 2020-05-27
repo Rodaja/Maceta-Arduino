@@ -21,7 +21,7 @@
 
 //Defining sensor pins
 #define GROUNDSENSOR A0
-#define DHTPIN 12
+#define DHTPIN 14
 
 // Defining the air sensor type
 #define DHTTYPE DHT11
@@ -32,7 +32,7 @@ String IP = "161.35.69.225";
 String URL = "http://" + IP + ":" + PORT + "/gardenia/api/flowerpots";
 String URL_UPDATE = URL + "/update";
 String MAC = WiFi.softAPmacAddress();
-String VERSION = "0.4.1";
+String VERSION = "0.5.0";
 
 //Constants screen
 #define SCREEN_WIDTH 128
