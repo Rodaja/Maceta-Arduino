@@ -32,7 +32,7 @@ String IP = "161.35.69.225";
 String URL = "http://" + IP + ":" + PORT + "/gardenia/api/flowerpots";
 String URL_UPDATE = URL + "/update";
 String MAC = WiFi.softAPmacAddress();
-String VERSION = "0.5.0";
+String VERSION = "0.5.1";
 
 //Constants screen
 #define SCREEN_WIDTH 128
@@ -209,11 +209,11 @@ void loop() {
   int airTemperature = getDataAirTemperature();
   sendPlotData(groundHumidity, airHumidity, airTemperature);
   showDataOnScreen("H.  " + String(groundHumidity) + "%");
-  showDataOnScreen("T.  " + String(airHumidity) + "C");
-  showDataOnScreen("HR. " + String(airTemperature) + "%");
+  showDataOnScreen("T.  " + String(airTemperature) + "C");
+  showDataOnScreen("HR. " + String(airHumidity) + "%");
   count += 1;
 
-  if (count > 1000){
+  if (count > 2500){
     updateSystem();
     count = 0;
   }
